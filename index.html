@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Style HTML Tables with CSS</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+</head>
+
+<body>
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search by Material or Company">
+   
+    <button onclick="addRow()">Add New Row</button>
+    <table class="content-table">
+        <thead>
+            <tr>
+              <th>Order Number</th>
+              <th>Date</th>
+              <th>Material</th>
+              <th>Weight</th>
+              <th>Company</th>
+              <th>Transport</th>
+              <th>Action</th> 
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr>
+              <td>1</td>
+              <th>20th april</th>
+              <td>Ferro Alloys</td>
+              <td>88,110</td>
+              <td>Tata Steel</td>
+              <td><a href="#" onclick="openModal(1)">View</a></td>
+            </tr>
+            <tr class="active-row">
+              <td>2</td>
+              <th>1st January</th>
+              <td>Niobium and Manganese</td>
+              <td>72,400</td>
+              <td>MM Ceramics</td>
+              <td><a href="#" onclick="openModal(2)">View</a></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <th>15th march </th>
+              <td>Manganese</td>
+              <td>52,300</td>
+              <td>Pachisia</td>
+              <td><a href="#" onclick="openModal(3)">View</a></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Order Status</h2>
+            <label><input type="checkbox" id="leftWarehouse1"> Order left warehouse</label><br>
+            <label><input type="checkbox" id="reachedWarehouse1"> Order reached warehouse</label>
+        </div>
+    </div>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <script>
+     var checkboxStates = {};
+
+     function addRow() {
+    const table = document.getElementById('tableBody');
+    const newRow = table.insertRow(-1);
+    const rank = table.rows.length;
+    
+    // Order Number
+    const cell1 = newRow.insertCell(0);
+    cell1.innerHTML = '<input type="text" placeholder="Order Number"/>';
+
+    // Date
+    const cell2 = newRow.insertCell(1);
+    cell2.innerHTML = '<input type="text" placeholder="Date"/>';
+
+    // Material Dropdown
+    const cell3 = newRow.insertCell(2);
+    cell3.innerHTML = `
+        <select>
+            <option value="ferro alloy">Ferro Alloy</option>
+            <option value="manganese">Manganese</option>
+            <option value="niobium">Niobium</option>
+        </select>`;
+
+    // Weight
+    const cell4 = newRow.insertCell(3);
+    cell4.innerHTML = '<input type="text" placeholder="Weight"/>';
+
+    // Company
+    const cell5 = newRow.insertCell(4);
+    cell5.innerHTML = '<input type="text" placeholder="Company"/>';
+
+    // Transport View Link
+    const cell6 = newRow.insertCell(5);
+    cell6.innerHTML = `<a href="#" onclick="openModal(${rank})">View</a>`;
+
+    // Action - Delete Button
+    const deleteCell = newRow.insertCell(6);
+    deleteCell.innerHTML = `<button onclick="deleteRow(this)">Delete</button>`;
+
+    newRow.className = rank % 2 === 0 ? 'active-row' : '';
+    checkboxStates[rank] = { leftWarehouse: false, reachedWarehouse: false };
+    if (rank % 2 === 0) { // If it's an even row
+        const inputs = newRow.querySelectorAll('input');
+        const selects = newRow.querySelectorAll('select');
+        inputs.forEach(input => input.classList.add('even-row-text'));
+        selects.forEach(select => select.classList.add('even-row-text'));
+    }
+
+}
+
+  
+function deleteRow(btn) {
+    // Find the parent row of the button and remove it
+    const row = btn.closest('tr');
+    const rank = row.firstChild.textContent;
+    delete checkboxStates[rank]; // Remove the state of the checkboxes for this row
+    row.remove();
+}
+
+function openModal(rank) {
+    var modal = document.getElementById("myModal");
+    var checkbox1 = modal.querySelector("#leftWarehouse1");
+    var checkbox2 = modal.querySelector("#reachedWarehouse1");
+
+    // Set the checkbox state based on the stored values, or initialize if not present
+    checkbox1.checked = checkboxStates[rank].leftWarehouse;
+    checkbox2.checked = checkboxStates[rank].reachedWarehouse;
+
+    // Remove previous onchange handlers to prevent memory leaks and incorrect behavior
+    checkbox1.onchange = null;
+    checkbox2.onchange = null;
+
+    // Assign new onchange handlers
+    checkbox1.onchange = function() {
+        checkboxStates[rank].leftWarehouse = this.checked;
+    };
+    checkbox2.onchange = function() {
+        checkboxStates[rank].reachedWarehouse = this.checked;
+    };
+
+    // Show the modal
+    modal.style.display = "block";
+
+    // Close handlers
+    var span = document.getElementsByClassName("close")[0];
+    span.onclick = function() {
+        modal.style.display = "none";
+    };
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+}
+
+// Call this function when the page loads to bind the 'View' links with openModal function
+function initializeViewLinks() {
+    var rows = document.getElementById('tableBody').rows;
+    for (var i = 0; i < rows.length; i++) {
+        // The rank is assumed to be the first cell's content
+        var rank = rows[i].cells[0].textContent;
+        checkboxStates[rank] = { leftWarehouse: false, reachedWarehouse: false };
+        var viewLink = rows[i].cells[4].getElementsByTagName('a')[0];
+        if (viewLink) {
+            viewLink.onclick = function(rank) {
+                return function() {
+                    openModal(rank);
+                };
+            }(rank);
+        }
+        if (rows[i].cells.length < 6) {
+            const deleteCell = rows[i].insertCell(5);
+            deleteCell.innerHTML = `<button onclick="deleteRow(this)">Delete</button>`;
+        }  
+    }
+}
+
+window.onload = initializeViewLinks;
+
+function searchTable() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("tableBody");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+        var orderTd = tr[i].getElementsByTagName("td")[0]; // Order Number
+        var dateTd = tr[i].getElementsByTagName("td")[1]; // Date
+        var materialTd = tr[i].getElementsByTagName("td")[2]; // Material
+        var companyTd = tr[i].getElementsByTagName("td")[4]; // Company
+        
+        // Updated search logic to include Date
+        if (orderTd || dateTd || materialTd || companyTd) {
+            if (
+                orderTd.innerHTML.toUpperCase().indexOf(filter) > -1 ||
+                dateTd.innerHTML.toUpperCase().indexOf(filter) > -1 ||
+                materialTd.innerText.toUpperCase().indexOf(filter) > -1 ||
+                companyTd.innerHTML.toUpperCase().indexOf(filter) > -1
+            ) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+function onSignIn(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+        // Use user information here or store the token to make requests to your backend
+
+        // After a successful sign-in, you might want to redirect the user to another page
+        window.location.href = 'homepage.html'; // Redirect to the home page after sign-in
+      }
+      
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log('User signed out.');
+          // Redirect to login page or handle logout
+        });
+      }
+    </script>
+ 
+
+</body>
+</html>
