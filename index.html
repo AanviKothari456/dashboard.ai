@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Style HTML Tables with CSS</title>
+    <title>Dashboard.ai</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
@@ -21,9 +21,14 @@
               <th>Date</th>
               <th>Material</th>
               <th>Weight</th>
-              <th>Company</th>
+              <th>Price</th>
               <th>Transport</th>
               <th>Action</th> 
+              <th>Email</th>
+              
+              
+         
+              <th>Company</th> 
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -50,6 +55,7 @@
               <td>52,300</td>
               <td>Pachisia</td>
               <td><a href="#" onclick="openModal(3)">View</a></td>
+              <td><button onclick="prepareEmail(1)">Email</button></td>
             </tr>
         </tbody>
     </table>
@@ -64,6 +70,30 @@
         </div>
     </div>
     <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+   
+    <div class="email-form">
+        <label for="emailRecipients">Recipients</label>
+        <input type="text" id="emailRecipients" placeholder="Enter email addresses separated by commas">
+        <label for="emailSubject">Subject</label>
+        <input type="text" id="emailSubject" placeholder="Enter subject">
+        <label for="emailBody">Body</label>
+        <textarea id="emailBody" placeholder="Enter your message"></textarea>
+        <button class="send-email-btn" onclick="sendEmail()">Send Email</button>
+    </div>
+    <script>
+        function sendEmail() {
+            var recipients = document.getElementById('emailRecipients').value;
+            var subject = document.getElementById('emailSubject').value;
+            var body = document.getElementById('emailBody').value;
+
+            var mailtoLink = 'mailto:' + encodeURIComponent(recipients) +
+                             '?subject=' + encodeURIComponent(subject) +
+                             '&body=' + encodeURIComponent(body);
+
+            window.location.href = mailtoLink;
+        }
+    </script>
     <script>
      var checkboxStates = {};
 
@@ -96,6 +126,8 @@
     // Company
     const cell5 = newRow.insertCell(4);
     cell5.innerHTML = '<input type="text" placeholder="Company"/>';
+    const cellPrice = newRow.insertCell(4);
+    cellPrice.innerHTML = '<input type="text" placeholder="Price"/>';
 
     // Transport View Link
     const cell6 = newRow.insertCell(5);
@@ -104,6 +136,11 @@
     // Action - Delete Button
     const deleteCell = newRow.insertCell(6);
     deleteCell.innerHTML = `<button onclick="deleteRow(this)">Delete</button>`;
+// Inside the addRow function, add the following before setting the className:
+
+// Email Button
+const emailCell = newRow.insertCell(7);
+emailCell.innerHTML = `<button onclick="prepareEmail(${rank})">Email</button>`;
 
     newRow.className = rank % 2 === 0 ? 'active-row' : '';
     checkboxStates[rank] = { leftWarehouse: false, reachedWarehouse: false };
@@ -159,6 +196,18 @@ function openModal(rank) {
             modal.style.display = "none";
         }
     };
+}
+function prepareEmail(rowNumber) {
+    const table = document.getElementById('tableBody');
+    const row = table.rows[rowNumber - 1]; // Get the correct row
+    const material = row.cells[2].querySelector('select').value; // Get the selected option's value
+    const weight = row.cells[3].querySelector('input').value; // Get the input's value
+    const price = row.cells[4].querySelector('input').value; // Get the input's value for price
+
+    // Populate the email form fields
+    document.getElementById('emailSubject').value = 'Order Request';
+    document.getElementById('emailBody').value = `Request to purchase Material ${material} weighing ${weight}kgs
+    at a price of Rs ${price}/kg.`;
 }
 
 // Call this function when the page loads to bind the 'View' links with openModal function
