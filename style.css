@@ -104,3 +104,50 @@ a.view-link:hover {
 .even-row-text {
     color: #009879;/* This will change the text color inside inputs and selects */
 }
+/* ...existing styles... */
+
+/* Email form styling */
+.email-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .email-form input[type="text"],
+  .email-form textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+    width: 100%;
+  }
+  
+  .email-form textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .email-form label {
+    font-weight: bold;
+  }
+  
+  /* Send email button styling */
+  .send-email-btn {
+    padding: 10px 20px;
+    background-color: #009879;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+  }
+  
+  .send-email-btn:hover {
+    background-color: #00795f;
+  }
+  
+  /* ...existing styles... */
+  
